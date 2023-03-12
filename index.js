@@ -75,7 +75,8 @@ app.get("/", function(req, res) {
     } else {
       res.render("list", {
         listTitle: "Today",
-        newListItems: foundItems
+        newListItems: foundItems,
+        getLists: getLists
       });
     }
   });
