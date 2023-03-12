@@ -14,7 +14,7 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 mongoose.set("strictQuery", false);
-const connectDB = async ()=> {
+const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB Connected: " + conn.connection.host);
@@ -56,61 +56,70 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 
-app.get("/", getItems, getLists, renderForm);
-
-function getItems(req, res, next) {
-  Item.find({}, function(err, foundItems) {
-    if (foundItems.length === 0) {
-      Item.insertMany(defaultItems, function(err) {
-        if (err) next(err);
-      });
-      res.redirect("/");
-    } else {
-      // console.log("foundItems" + foundItems);
-      res.locals.listTitle = "Today";
-      res.locals.newListItems = foundItems;
-      next();
-    }
-  });
-};
-
-function getLists(req, res, next) {
-  List.find({}, function(err, foundLists) {
-    if (err) next(err);
-    // console.log("foundLists" + foundLists);
-    // console.log(typeof foundLists);
-    res.locals.newLists = foundLists;
-    next();
-  });
-};
-
-function renderForm(req, res) {
-  console.log(res.locals);
-  res.render("list", res.locals);
-};
-
-
-// app.get("/", function(req, res) {
+// app.get("/", getItems, getLists, renderForm);
 //
+// function getItems(req, res, next) {
 //   Item.find({}, function(err, foundItems) {
 //     if (foundItems.length === 0) {
 //       Item.insertMany(defaultItems, function(err) {
-//         if (err) {
-//           console.log(err);
-//         } else {
-//           console.log("basarili-insert");
-//         }
+//         if (err) next(err);
 //       });
 //       res.redirect("/");
 //     } else {
-//       console.log(foundItems);
-//       res.render("list", {
-//         listTitle: "Today",
-//         newListItems: foundItems
-//       });
+//       // console.log("foundItems" + foundItems);
+//       res.locals.listTitle = "Today";
+//       res.locals.newListItems = foundItems;
+//       next();
 //     }
 //   });
-// });
+// };
+//
+// function getLists(req, res, next) {
+//   List.find({}, function(err, foundLists) {
+//     if (foundLists.length === 0) {
+//       res.redirect("/");
+//     } else {
+//       if (err) next(err);
+//       // console.log("foundLists" + foundLists);
+//       // console.log(typeof foundLists);
+//       res.locals.newLists = foundLists;
+//     }
+//     next();
+//   });
+// };
+//
+// function renderForm(req, res) {
+//   // console.log(res.locals);
+//   res.render("list", res.locals);
+// };
+
+const newLists = [];
+
+
+app.get("/", function(req, res) {
+  List.find({}, function(err, x) {
+    newLists.push(x);
+  });
+
+  Item.find({}, function(err, foundItems) {
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, function(err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("basarili-insert");
+        }
+      });
+      res.redirect("/");
+    } else {
+      res.render("list", {
+        listTitle: "Today",
+        newListItems: foundItems,
+        newLists: newLists[0]
+      });
+    }
+  });
+});
 
 
 app.post("/", function(req, res) {
@@ -124,7 +133,9 @@ app.post("/", function(req, res) {
     item.save();
     res.redirect("/");
   } else {
-    List.findOne({name: listName}, function(err, foundList) {
+    List.findOne({
+      name: listName
+    }, function(err, foundList) {
       foundList.items.push(item);
       foundList.save();
       res.redirect("/" + listName);
@@ -138,7 +149,7 @@ app.post("/delete", function(req, res) {
   const listName = req.body.listName;
 
   if (listName === "Today") {
-    Item.findByIdAndRemove(checkedBoxId, function(err){
+    Item.findByIdAndRemove(checkedBoxId, function(err) {
       if (err) {
         console.log(err);
       } else {
@@ -147,7 +158,15 @@ app.post("/delete", function(req, res) {
       }
     });
   } else {
-    List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedBoxId}}}, function(err, foundList) {
+    List.findOneAndUpdate({
+      name: listName
+    }, {
+      $pull: {
+        items: {
+          _id: checkedBoxId
+        }
+      }
+    }, function(err, foundList) {
       if (!err) {
         res.redirect("/" + listName);
       }
@@ -162,7 +181,9 @@ app.get("/about", function(req, res) {
 
 app.get("/:customListName", function(req, res) {
   const customListName = _.capitalize(req.params.customListName);
-  List.findOne({name: customListName}, function(err, foundList) {
+  List.findOne({
+    name: customListName
+  }, function(err, foundList) {
     if (err) {
 
     } else {
