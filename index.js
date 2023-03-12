@@ -76,7 +76,7 @@ app.get("/", function(req, res) {
       res.render("list", {
         listTitle: "Today",
         newListItems: foundItems,
-        getLists: getLists
+        lists: getLists()
       });
     }
   });
