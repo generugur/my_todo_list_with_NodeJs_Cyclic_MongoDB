@@ -1,4 +1,3 @@
-<%- include("header") -%>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">To-Do List</a>
@@ -7,9 +6,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <% newListItems.forEach((item) => { %>
+        <% const lists = await getLists(); %>
+        <% lists.forEach((list) => { %>
           <li class="nav-item">
-            <a class="nav-link" href="#"><%= item.name %></a>
+            <a class="nav-link" href="#"><%= list.listeAdi %></a>
           </li>
         <% }); %>
       </ul>
@@ -17,6 +17,7 @@
   </div>
 </nav>
 
+<%- include("header") -%>
 
 <div class="box" id="heading">
   <h1> <%= listTitle %> </h1>

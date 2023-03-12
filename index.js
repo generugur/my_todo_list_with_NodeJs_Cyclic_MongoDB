@@ -55,7 +55,10 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
-
+const getLists = async () => {
+  const lists = await db.collection('lists').find().toArray();
+  return lists;
+}
 
 
 app.get("/", function(req, res) {
