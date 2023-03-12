@@ -6,7 +6,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <% const lists = await getLists(); %>
+        <% const lists = getLists(); %>
         <% lists.forEach((list) => { %>
           <li class="nav-item">
             <a class="nav-link" href="#"><%= list.listeAdi %></a>
