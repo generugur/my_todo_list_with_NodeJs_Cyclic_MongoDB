@@ -55,13 +55,10 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
-const foundLists = [];
 
-app.get("/", function(req, res) {
-  List.find({}, function(err, found) {
-    foundLists.push(found);
-  });
+app.get("/", getLists, getItems);
 
+function getItems(req, res) {
   Item.find({}, function(err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err) {
@@ -73,14 +70,49 @@ app.get("/", function(req, res) {
       });
       res.redirect("/");
     } else {
-      res.render("list", {
-        listTitle: "Today",
-        newListItems: foundItems,
-        lists: foundLists[0]
-      });
+      res.locals.listTitle = "Today";
+      res.locals.newListItems = foundItems;
     }
   });
-});
+};
+
+
+function getLists(req, res, next) {
+  List.find({}, function(err, foundLists) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.locals.lists = foundLists;
+    }
+  });
+};
+
+function renderForm(req, res) {
+  res.render("list");
+};
+
+
+// app.get("/", function(req, res) {
+//
+//   Item.find({}, function(err, foundItems) {
+//     if (foundItems.length === 0) {
+//       Item.insertMany(defaultItems, function(err) {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           console.log("basarili-insert");
+//         }
+//       });
+//       res.redirect("/");
+//     } else {
+//       console.log(foundItems);
+//       res.render("list", {
+//         listTitle: "Today",
+//         newListItems: foundItems
+//       });
+//     }
+//   });
+// });
 
 
 app.post("/", function(req, res) {
