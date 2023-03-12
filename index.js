@@ -78,13 +78,15 @@ function getLists(req, res, next) {
   List.find({}, function(err, foundLists) {
     if (err) next(err);
     // console.log("foundLists" + foundLists);
+    // console.log(typeof foundLists);
     res.locals.newLists = foundLists;
     next();
   });
 };
 
 function renderForm(req, res) {
-  res.render("list");
+  console.log(res.locals);
+  res.render("list", res.locals);
 };
 
 
