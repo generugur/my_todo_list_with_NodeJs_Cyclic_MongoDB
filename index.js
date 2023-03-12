@@ -56,34 +56,30 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 
-app.get("/", getLists, getItems);
+app.get("/", getItems, getLists, renderForm);
 
-function getItems(req, res) {
+function getItems(req, res, next) {
   Item.find({}, function(err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("basarili-insert");
-        }
+        if (err) next(err);
       });
       res.redirect("/");
     } else {
+      // console.log("foundItems" + foundItems);
       res.locals.listTitle = "Today";
       res.locals.newListItems = foundItems;
+      next();
     }
   });
 };
 
-
 function getLists(req, res, next) {
   List.find({}, function(err, foundLists) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.locals.lists = foundLists;
-    }
+    if (err) next(err);
+    // console.log("foundLists" + foundLists);
+    res.locals.newLists = foundLists;
+    next();
   });
 };
 

@@ -8,11 +8,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <% lists.forEach((list) => { %>
+        <% console.log(newLists); %>
+        <% newLists.forEach(function(list) { %>
           <li class="nav-item">
             <a class="nav-link" href="/"><%= list.name %></a>
           </li>
-        <% }); %>
+        <% }) %>
       </ul>
     </div>
   </div>
