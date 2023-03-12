@@ -55,13 +55,13 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
-const getLists = async () => {
-  const lists = await db.collection('lists').find().toArray();
-  return lists;
-}
-
+const foundLists = [];
 
 app.get("/", function(req, res) {
+  List.find({}, function(err, found) {
+    foundLists.push(found);
+  });
+
   Item.find({}, function(err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err) {
@@ -76,7 +76,7 @@ app.get("/", function(req, res) {
       res.render("list", {
         listTitle: "Today",
         newListItems: foundItems,
-        lists: getLists()
+        lists: foundLists[0]
       });
     }
   });
