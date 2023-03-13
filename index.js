@@ -24,6 +24,9 @@ const connectDB = async () => {
   }
 }
 
+// zamanı ölçmek için
+var start = Date.now();
+
 
 const itemsSchema = new mongoose.Schema({
   name: {
@@ -56,71 +59,6 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 
-// app.get("/", getItems, getLists, renderForm);
-//
-// function getItems(req, res, next) {
-//   Item.find({}, function(err, foundItems) {
-//     if (foundItems.length === 0) {
-//       Item.insertMany(defaultItems, function(err) {
-//         if (err) next(err);
-//       });
-//       res.redirect("/");
-//     } else {
-//       // console.log("foundItems" + foundItems);
-//       res.locals.listTitle = "Today";
-//       res.locals.newListItems = foundItems;
-//       next();
-//     }
-//   });
-// };
-//
-// function getLists(req, res, next) {
-//   List.find({}, function(err, foundLists) {
-//     if (foundLists.length === 0) {
-//       res.redirect("/");
-//     } else {
-//       if (err) next(err);
-//       // console.log("foundLists" + foundLists);
-//       // console.log(typeof foundLists);
-//       res.locals.newLists = foundLists;
-//     }
-//     next();
-//   });
-// };
-//
-// function renderForm(req, res) {
-//   // console.log(res.locals);
-//   res.render("list", res.locals);
-// };
-
-const newLists = [];
-
-
-app.get("/", function(req, res) {
-  List.find({}, function(err, x) {
-    newLists.push(x);
-  });
-
-  Item.find({}, function(err, foundItems) {
-    if (foundItems.length === 0) {
-      Item.insertMany(defaultItems, function(err) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("basarili-insert");
-        }
-      });
-      res.redirect("/");
-    } else {
-      res.render("list", {
-        listTitle: "Today",
-        newListItems: foundItems,
-        newLists: newLists[0]
-      });
-    }
-  });
-});
-
 
 app.post("/", function(req, res) {
 
@@ -143,6 +81,48 @@ app.post("/", function(req, res) {
   }
 
 });
+
+// liste adlarını alabilmek için bir fonksiyon
+function findListNames() {
+  var listeler = [];
+  List.find({}, async function(err, foundLists) {
+    await foundLists.forEach(isim => {
+      listeler.push(isim);
+    });
+  });
+  console.log(listeler);
+  return listeler;
+};
+
+
+app.get("/", function(req, res) {
+  List.find({}, async function(err, x) {
+    const abc = await x;
+    Item.find({}, function(err, foundItems) {
+      if (foundItems.length === 0) {
+        Item.insertMany(defaultItems, function(err) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("basarili-insert");
+          }
+        });
+        res.redirect("/");
+      } else {
+        var middle = Date.now();
+        console.log("ejs ye renderlanan yer: " + (middle - start) + " " + typeof abc);
+        console.log(findListNames());
+        res.render("list", {
+          listTitle: "Today",
+          newListItems: foundItems,
+          newLists: abc,
+          zaman: start
+        });
+      }
+    });
+  });
+});
+
 
 app.post("/delete", function(req, res) {
   const checkedBoxId = req.body.checkbox;
@@ -180,28 +160,35 @@ app.get("/about", function(req, res) {
 });
 
 app.get("/:customListName", function(req, res) {
-  const customListName = _.capitalize(req.params.customListName);
-  List.findOne({
-    name: customListName
-  }, function(err, foundList) {
-    if (err) {
+  if (req.params.customListName === "") {
+    res.redirect("/");
+  } else {
+    const customListName = _.capitalize(req.params.customListName);
+    List.findOne({
+      name: customListName
+    }, function(err, foundList) {
+      if (err) {
 
-    } else {
-      if (foundList) {
-        res.render("list", {
-          listTitle: foundList.name,
-          newListItems: foundList.items
-        });
       } else {
-        const list = new List({
-          name: customListName,
-          items: defaultItems
-        });
-        list.save();
-        res.redirect("/" + customListName);
+        if (foundList) {
+          res.render("list", {
+            listTitle: foundList.name,
+            newListItems: foundList.items,
+            // buraya fonksiyon yazıcam
+            newLists: abc,
+            zaman: start
+          });
+        } else {
+          const list = new List({
+            name: customListName,
+            items: defaultItems
+          });
+          list.save();
+          res.redirect("/" + customListName);
+        }
       }
-    }
-  });
+    });
+  }
 });
 
 connectDB().then(() => {

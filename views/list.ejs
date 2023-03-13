@@ -6,13 +6,22 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
+
+
+
+      <% console.log("list.ejs nin içinde: " + (Date.now() - locals.zaman) + " " + typeof newLists); %>
+      <% const liste = locals.newLists %>
+      <% console.log(locals.zaman); %>
+      <%  liste.forEach(function(list) { %>
       <ul class="navbar-nav">
-        <% newLists.forEach(function(list) { %>
         <li class="nav-item">
           <a class="nav-link" href=""><%= list.name %></a>
         </li>
-        <% }) %>
       </ul>
+      <%  });%>
+
+
+
     </div>
   </div>
 </nav>
