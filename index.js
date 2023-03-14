@@ -94,7 +94,6 @@ function getListNames() {
     findListNames()
       .then(names => {
         listNames = names.map(name => name);
-        console.log("Liste isimleri alındı");
         resolve(listNames);
       })
       .catch(error => reject(error));
@@ -105,7 +104,7 @@ function getListNames() {
 app.get("/", function(req, res) {
   getListNames()
   .then(listNames => {
-    console.log("Listeler: ", listNames);
+    console.log("Listeler alındı.");
   })
   .catch(error => console.error(error));
 
