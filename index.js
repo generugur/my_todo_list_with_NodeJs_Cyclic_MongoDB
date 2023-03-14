@@ -95,7 +95,7 @@ function getListNames() {
       .then(names => {
         listNames = names.map(name => name);
         console.log("Liste isimleri alındı");
-        resolve();
+        resolve(listNames);
       })
       .catch(error => reject(error));
   });
