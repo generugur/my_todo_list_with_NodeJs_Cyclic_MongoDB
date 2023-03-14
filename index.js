@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
+
+// mongodb bağlantı noktası
 const PORT = process.env.PORT || 3000;
 mongoose.set("strictQuery", false);
 const connectDB = async () => {
@@ -25,7 +27,7 @@ const connectDB = async () => {
 }
 
 
-
+// mongoose şema oluşturma
 const itemsSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -81,7 +83,6 @@ app.post("/", function(req, res) {
 });
 
 // liste adlarını alabilmek için bir fonksiyon
-
 let listNames = [];
 
 function findListNames() {
@@ -89,18 +90,25 @@ function findListNames() {
 }
 
 function getListNames() {
-  findListNames()
-    .then(names => {
-      listNames = names.map(name => name);
-      console.log("Liste isimleri alındı");
-    })
-    .catch(error => console.error(error));
+  return new Promise((resolve, reject) => {
+    findListNames()
+      .then(names => {
+        listNames = names.map(name => name);
+        console.log("Liste isimleri alındı");
+        resolve();
+      })
+      .catch(error => reject(error));
+  });
 };
 
 
-
 app.get("/", function(req, res) {
-  getListNames();
+  getListNames()
+  .then(listNames => {
+    console.log("Listeler: ", listNames);
+  })
+  .catch(error => console.error(error));
+
   Item.find({}, function(err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(defaultItems, function(err) {
@@ -122,8 +130,7 @@ app.get("/", function(req, res) {
 });
 
 
-
-
+// silmek için
 app.post("/delete", function(req, res) {
   const checkedBoxId = req.body.checkbox;
   const listName = req.body.listName;
