@@ -24,8 +24,6 @@ const connectDB = async () => {
   }
 }
 
-// zamanı ölçmek için
-var start = Date.now();
 
 
 const itemsSchema = new mongoose.Schema({
@@ -83,45 +81,47 @@ app.post("/", function(req, res) {
 });
 
 // liste adlarını alabilmek için bir fonksiyon
+
+let listNames = [];
+
 function findListNames() {
-  var listeler = [];
-  List.find({}, async function(err, foundLists) {
-    await foundLists.forEach(isim => {
-      listeler.push(isim);
-    });
-  });
-  console.log(listeler);
-  return listeler;
+  return List.find().select('name').exec();
+}
+
+function getListNames() {
+  findListNames()
+    .then(names => {
+      listNames = names.map(name => name);
+      console.log("Liste isimleri alındı");
+    })
+    .catch(error => console.error(error));
 };
 
 
+
 app.get("/", function(req, res) {
-  List.find({}, async function(err, x) {
-    const abc = await x;
-    Item.find({}, function(err, foundItems) {
-      if (foundItems.length === 0) {
-        Item.insertMany(defaultItems, function(err) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("basarili-insert");
-          }
-        });
-        res.redirect("/");
-      } else {
-        var middle = Date.now();
-        console.log("ejs ye renderlanan yer: " + (middle - start) + " " + typeof abc);
-        console.log(findListNames());
-        res.render("list", {
-          listTitle: "Today",
-          newListItems: foundItems,
-          newLists: abc,
-          zaman: start
-        });
-      }
-    });
+  getListNames();
+  Item.find({}, function(err, foundItems) {
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, function(err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("basarili-insert");
+        }
+      });
+      res.redirect("/");
+    } else {
+      res.render("list", {
+        listTitle: "Today",
+        newListItems: foundItems,
+        newLists: listNames
+      });
+    }
   });
 });
+
+
 
 
 app.post("/delete", function(req, res) {
@@ -168,15 +168,15 @@ app.get("/:customListName", function(req, res) {
       name: customListName
     }, function(err, foundList) {
       if (err) {
-
+        console.log(err);
       } else {
         if (foundList) {
           res.render("list", {
             listTitle: foundList.name,
             newListItems: foundList.items,
             // buraya fonksiyon yazıcam
-            newLists: abc,
-            zaman: start
+            // yazdım ehehe
+            newLists: listNames
           });
         } else {
           const list = new List({

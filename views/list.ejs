@@ -8,10 +8,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
 
 
-
-      <% console.log("list.ejs nin içinde: " + (Date.now() - locals.zaman) + " " + typeof newLists); %>
       <% const liste = locals.newLists %>
-      <% console.log(locals.zaman); %>
       <%  liste.forEach(function(list) { %>
       <ul class="navbar-nav">
         <li class="nav-item">
