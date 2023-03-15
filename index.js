@@ -166,6 +166,9 @@ app.get("/:customListName", function(req, res) {
     res.redirect("/");
   } else {
     const customListName = _.capitalize(req.params.customListName);
+    // if (listNames.includes(customListName)) {
+    //
+    // }
     List.findOne({
       name: customListName
     }, function(err, foundList) {
@@ -190,18 +193,6 @@ app.get("/:customListName", function(req, res) {
     });
   }
 });
-
-
-
-let deneme = "ikinci";
-
-app.get("/" + deneme, function(req, res) {
-  console.log("açıldı");
-})
-
-
-
-
 
 
 
