@@ -161,10 +161,6 @@ app.post("/delete", function(req, res) {
 });
 
 
-app.get("/about", function(req, res) {
-  res.render("about");
-});
-
 app.get("/:customListName", function(req, res) {
   if (req.params.customListName === "") {
     res.redirect("/");
@@ -180,8 +176,6 @@ app.get("/:customListName", function(req, res) {
           res.render("list", {
             listTitle: foundList.name,
             newListItems: foundList.items,
-            // buraya fonksiyon yazıcam
-            // yazdım ehehe
             newLists: listNames
           });
         } else {
@@ -196,6 +190,20 @@ app.get("/:customListName", function(req, res) {
     });
   }
 });
+
+
+
+let deneme = "ikinci";
+
+app.get("/" + deneme, function(req, res) {
+  console.log("açıldı");
+})
+
+
+
+
+
+
 
 connectDB().then(() => {
   app.listen(PORT, () => {

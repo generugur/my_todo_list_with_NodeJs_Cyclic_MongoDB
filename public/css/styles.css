@@ -93,3 +93,13 @@ footer {
   color: rgba(0, 0, 0, 0.5);
   text-align: center;
 }
+
+
+#inputBox {
+  width:25%;
+  float: right;
+}
+
+#button-addon2 {
+  width: 100px;
+}
